@@ -32,5 +32,4 @@ func init() {
 	createMeetingCmd.Flags().StringSliceP("participants", "p", make([]string, 0), "title")
 	createMeetingCmd.Flags().StringP("startTime", "s", "", "startTime")
 	createMeetingCmd.Flags().StringP("endTime", "e", "", "User endTime")
-
 }
