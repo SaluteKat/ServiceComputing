@@ -61,17 +61,40 @@
     如果创建会议时，参与者不存在：  
     ![image8](https://img-blog.csdnimg.cn/20181102134500641.png)  
     如果创建会议的时间不合法：  
+    ![image10](https://img-blog.csdnimg.cn/20181102135723567.png)
 
-    如果参与者在这段时间里没有空：  
+    如果参与者在这段时间里没有空： 
+    ![image14](https://img-blog.csdnimg.cn/20181102142725677.png) 
+
+    如果成功创建会议，那么也会修改User.json去写入他们创建和参与的会议：  
+    ![image13](https://img-blog.csdnimg.cn/20181102142503203.png)  
+    我们可以看到在Meeting.json和User.json中都写入了他们参加会议的情况：  
+    ![image15](https://img-blog.csdnimg.cn/2018110214290650.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0VtaWx5Qmx1c2U=,size_16,color_FFFFFF,t_70)    
+
+    ![image16](https://img-blog.csdnimg.cn/20181102142930245.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0VtaWx5Qmx1c2U=,size_16,color_FFFFFF,t_70)  
+
 
 - agenda deleteMeeting  
-    如果删除会议的时候会议名字不存在：  
+    如果删除会议的时候会议名字不存在：   
+    ![image17](https://img-blog.csdnimg.cn/20181102143039461.png)  
 
-    成功删除会议：  
+    如果要删除的会议以登入的账号并不是这个会议的发起者的时候：  
+    ![image18](https://img-blog.csdnimg.cn/20181102143229879.png)
+
+    成功删除会议，同时我们也会删除会议参与者的相关记录：  
+    ![image19](https://img-blog.csdnimg.cn/20181102143328805.png)  
+    Meeting.json中记录也将会被删除：  
+    ![image20](https://img-blog.csdnimg.cn/20181102143502855.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0VtaWx5Qmx1c2U=,size_16,color_FFFFFF,t_70)  
+    User.json中的记录也会被删除：  
+    ![image21](https://img-blog.csdnimg.cn/20181102143548770.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0VtaWx5Qmx1c2U=,size_16,color_FFFFFF,t_70)  
+
+
 
 - agenda logout  
     成功登出：  
+    ![image11](https://img-blog.csdnimg.cn/20181102141715576.png)
 
 - 项目log日志：  
+    ![image12](https://img-blog.csdnimg.cn/20181102141817697.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L0VtaWx5Qmx1c2U=,size_16,color_FFFFFF,t_70)
 
 

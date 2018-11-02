@@ -22,10 +22,10 @@ type Meeting struct {
 
 //time manage function
 func DateToString(date time.Time) string {
-	return date.Format("0000-00-00/00:00")
+	return date.Format("2006-01-02/15:04")
 }
 func StringToDate(date string) (time.Time, error) {
-	the_time, err := time.Parse("0000-00-00/00:00", date)
+	the_time, err := time.Parse("2006-01-02/15:04", date)
 	return the_time, err
 }
 func SmallDate(date1, date2 time.Time) bool {
@@ -39,7 +39,7 @@ func TimeContact(newDateS, newDateE, oriDateS, oriDateE time.Time, userName stri
 		fmt.Println("Invaild time: start time can't be greater than end time")
 		return true
 	}
-	if SmallDate(newDateE, oriDateS) || LargeDate(newDateS, oriDateE) {
+	if SmallDate(newDateE, oriDateS) || LargeDate(newDateS, oriDateE) {   
 		return false
 	}
 	fmt.Println("time contract with " + userName + "' meeting with id:" + meetingId)
@@ -192,3 +192,4 @@ func DeleteMeeting(title string){
 	buser, _ := json.Marshal(allUser)
 	foutuser.Write(buser)
 }
+
