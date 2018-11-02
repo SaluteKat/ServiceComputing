@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"agenda/entity/Meeting"
 	"fmt"
+	"agenda/entity/Meeting"
 	"github.com/spf13/cobra"
 )
 

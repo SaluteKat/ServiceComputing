@@ -47,7 +47,8 @@ func TimeContact(newDateS, newDateE, oriDateS, oriDateE time.Time, userName stri
 }
 
 func CreateAMeeting(meeting *Meeting) {
-	currentName := User.GetCurUserName()
+	bytes,_ := ioutil.ReadFile("data/current.txt")
+	currentName := string(bytes)
 	if currentName == "" {
 		fmt.Println("You haven't logged in")
 		return
@@ -58,23 +59,25 @@ func CreateAMeeting(meeting *Meeting) {
 	meeting.Participants = append(meeting.Participants, currentName)
 	allMeetings[meeting.Id] = *meeting
 
-	var allUser map[string]*User.User = GetAllUserInfo()
+	var allUser []User.User = GetAllUserInfo()
 	//check all participanter exist, and time contract
 	for _, pName := range meeting.Participants {
 		//check if the user exist
-		if _, ok := allUser[pName]; !ok {
+		var userind int = GetNameID(pName)
+		if userind < 0 {
 			fmt.Println("No such user:" + pName + "!")
 			return
 		}
 		//check if the user's old meeting is contract with the new one
-		for _, meetingId := range allUser[pName].ParticipantMeeting {
+		for _, meetingId := range allUser[userind].ParticipantMeeting {
 			if TimeContact(meeting.StartTime, meeting.EndTime, allMeetings[meetingId].StartTime, allMeetings[meetingId].EndTime, pName, meetingId) {
 				return
 			}
 		}
-		allUser[pName].ParticipantMeeting = append(allUser[pName].ParticipantMeeting, meeting.Id)
+		allUser[userind].ParticipantMeeting = append(allUser[userind].ParticipantMeeting, meeting.Id)
 	}
-	allUser[currentName].SponsorMeeting = append(allUser[currentName].SponsorMeeting, meeting.Id)
+	var nowindex int = GetNameID(currentName)
+	allUser[nowindex].SponsorMeeting = append(allUser[nowindex].SponsorMeeting, meeting.Id)
 
 	fout, _ := os.Create("data/Meeting.json")
 	defer fout.Close()
@@ -84,6 +87,17 @@ func CreateAMeeting(meeting *Meeting) {
 	defer foutuser.Close()
 	buser, _ := json.Marshal(allUser)
 	foutuser.Write(buser)
+}
+
+func GetNameID(name string) int{
+	var allUser []User.User = GetAllUserInfo()
+	num := len(allUser)
+	for a := 0; a < num; a++ {
+		if allUser[a].Username == name{
+			return a
+		}
+	}
+	return -1
 }
 
 //load all meeting infomation
@@ -100,13 +114,81 @@ func GetAllMeetingInfo() map[string]Meeting {
 	return allMeetingInfo
 }
 
-//load all user infomation to User.AllUserInfo
-func GetAllUserInfo() map[string]*User.User {
-	byteIn, err := ioutil.ReadFile("data/User.json")
-	if err != nil {
-		log.Fatal(err)
+func check(r error) {
+	if r != nil {
+		log.Fatal(r)
 	}
-	var allUserInfo map[string]*User.User
-	json.Unmarshal(byteIn, &allUserInfo)
-	return allUserInfo
+}
+
+//load all user infomation to User.AllUserInfo
+func GetAllUserInfo() []User.User {
+	var users []User.User
+	byteIn, err := ioutil.ReadFile("data/User.json")
+	check(err)
+	jsonStr := string(byteIn)
+	json.Unmarshal([]byte(jsonStr), &users)
+	return users
+}
+
+//delete a meeting by title
+func DeleteMeeting(title string){
+	bytes,_ := ioutil.ReadFile("data/current.txt")
+	curuser := string(bytes)
+	var allMeetings map[string]Meeting = GetAllMeetingInfo()
+	var allUser []User.User = GetAllUserInfo()
+
+	var meetingleng int = len(allMeetings)
+	var flag bool = false
+	var value Meeting
+	var meetingindex string
+	for jj := 0; jj < meetingleng; jj++ {
+		strindex := strconv.Itoa(jj)
+		if allMeetings[strindex].Title == title {
+			meetingindex = strindex
+			flag = true
+			value = allMeetings[strindex]
+		}
+	}
+	if !flag {
+		fmt.Println("Meeting does not exist!")
+		return
+	}
+	if (value.Sponsor != curuser){
+		fmt.Println("Sorry, you are not the sponser of this meeting")
+		return
+	}
+	for _, pName := range value.Participants {
+		//check if the user exist
+		var userind int = GetNameID(pName)
+		if userind < 0 {
+			fmt.Println("No such user:" + pName + "!")
+			return
+		}
+		//check if the user's old meeting is contract with the new one
+		var length int = len(allUser[userind].ParticipantMeeting)
+		for ii := 0; ii < length; ii++ {
+			if allUser[userind].ParticipantMeeting[ii] == value.Id {
+				allUser[userind].ParticipantMeeting = append(allUser[userind].ParticipantMeeting[:ii], allUser[userind].ParticipantMeeting[ii+1:]...)
+			}
+		}
+	}
+	var nowindex int = GetNameID(value.Sponsor)
+	var leng int = len(allUser[nowindex].SponsorMeeting)
+	for aa := 0; aa < leng; aa++ {
+		if allUser[nowindex].SponsorMeeting[aa] == value.Id {
+			allUser[nowindex].SponsorMeeting = append(allUser[nowindex].SponsorMeeting[:aa], allUser[nowindex].SponsorMeeting[aa+1:]...)
+		}
+	}
+
+	delete(allMeetings, meetingindex)
+	fmt.Println("Delete meeting successfully")
+
+	fout, _ := os.Create("data/Meeting.json")
+	defer fout.Close()
+	b, _ := json.Marshal(allMeetings)
+	fout.Write(b)
+	foutuser, _ := os.Create("data/User.json")
+	defer foutuser.Close()
+	buser, _ := json.Marshal(allUser)
+	foutuser.Write(buser)
 }
